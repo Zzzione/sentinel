@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: sentinel_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: aaa_user
+      POSTGRES_PASSWORD: aaa_password
+      POSTGRES_DB: aaa_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  auth-service:
+    build: .
+    container_name: sentinel_auth
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: "postgresql+psycopg2://aaa_user:aaa_password@postgres:5432/aaa_db"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app
+
+volumes:
+  pgdata:
